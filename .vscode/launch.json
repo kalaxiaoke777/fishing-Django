@@ -1,0 +1,63 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "justMyCode": false,
+            "name": "Python: 远程调试blender内嵌脚本|4444端口",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+                "host": "127.0.0.1",
+                "port": 8089
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "/home/work/code"
+                }
+            ]
+        },
+        {
+            "name": "Python 调试程序: Django",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "runserver",
+                "0.0.0.0:29745"
+            ],
+            "django": true,
+            "justMyCode": true
+        },
+        {
+            "name": "Django: Runserver",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "runserver"
+            ],
+            "django": true
+        },
+        {
+            "name": "Django: Import Pipeline Data",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "import_pipeline_data"
+            ],
+            "django": true
+        },
+        {
+            "name": "Django: initialize_pipeline_configure_scheme",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "initialize_pipeline_configure_scheme"
+            ],
+            "django": true
+        }
+    ],
+}
