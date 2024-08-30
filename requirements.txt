@@ -4,3 +4,6 @@ django
 djangorestframework
 markdown       # Markdown support for the browsable API.
 django-filter  # Filtering support
+proj
+Geoip
+GEOS

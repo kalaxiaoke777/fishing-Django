@@ -1,6 +1,3 @@
-# fishing-Django
-
-windos环境下安装gdal执行
 set OSGEO4W_ROOT=C:\OSGeo4W
 set GDAL_DATA=%OSGEO4W_ROOT%\share\gdal
 set PROJ_LIB=%OSGEO4W_ROOT%\share\proj

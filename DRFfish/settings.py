@@ -26,7 +26,8 @@ SECRET_KEY = "django-insecure-*rq2s)7_8fg(d%*^u2adl=_k&=u1h#60wtokoy_x&apo9rpupm
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+GDAL_LIBRARY_PATH = r"C:\\OSGeo4W\\bin\\gdal309.dll"
+GEOS_LIBRARY_PATH = r"C:\\OSGeo4W\\bin\\geos_c.dll"
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -37,6 +38,7 @@ REST_FRAMEWORK = {
 # Application definition
 
 INSTALLED_APPS = [
+    "django.contrib.gis",
     "fish",
     "user_management",
     "rest_framework",
@@ -86,9 +88,13 @@ WSGI_APPLICATION = "DRFfish.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": "fish_pone",
+        "USER": "postgres",
+        "PASSWORD": "123456",
+        "HOST": "127.0.0.1",
+        "PORT": "5432",
+    },
 }
 
 
