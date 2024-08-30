@@ -1,12 +1,16 @@
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator, MaxValueValidator
+import uuid
 
 
 class FishingPond(models.Model):
     # 鱼塘ID（唯一标识）
     pond_id = models.AutoField(primary_key=True, verbose_name="鱼塘ID")
 
+    uuid = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True, verbose_name="唯一标识符"
+    )
     # 鱼塘名称（必填）
     name = models.CharField(max_length=255, unique=True, verbose_name="鱼塘名称")
 
@@ -35,11 +39,14 @@ class FishingPond(models.Model):
         max_length=20, choices=POND_TYPE_CHOICES, verbose_name="鱼塘类型"
     )
 
-    # 鱼塘图片（base64编码，必填）
-    image_base64 = models.TextField(verbose_name="鱼塘图片 (Base64编码)")
+    image_base64 = models.TextField(
+        verbose_name="鱼塘图片 (Base64编码)", blank=True, null=True
+    )
 
     # 鱼塘电话（非必填）
-    phone_number = models.CharField(max_length=20, blank=True, verbose_name="鱼塘电话")
+    phone_number = models.CharField(
+        max_length=20, blank=True, null=True, verbose_name="鱼塘电话"
+    )
 
     # 营业开始时间（非必填）
     opening_time = models.TimeField(blank=True, null=True, verbose_name="营业开始时间")
