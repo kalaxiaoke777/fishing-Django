@@ -1,1 +1,6 @@
-*/log
+# Django
+*.log
+*.pot
+*.pyc
+*.exe
+__pycache__/
