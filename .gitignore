@@ -1,1 +1,10 @@
-*/log
+# Django
+*.log
+*.pot
+*.pyc
+*.exe
+logs/
+DRFfish/
+__pycache__/
+build/
+dist/
