@@ -11,7 +11,7 @@ class CustomUser(AbstractUser):
     userId = models.CharField(max_length=100, unique=True)
     userKey = models.CharField(max_length=255, unique=True)
     openId = models.CharField(max_length=100, unique=True)
-    phoneNumber = models.CharField(max_length=100, unique=True)
+    phoneNumber = models.CharField(max_length=100, blank=True, unique=True)
 
     class Meta:
         db_table = "user_management"
@@ -20,6 +20,34 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    @classmethod
+    def create_or_update_from_wechat(cls, user_data):
+        """
+        从微信数据创建或更新用户实例。
+
+        :param user_data: 包含微信返回的用户数据的字典
+        :return: 创建或更新后的用户实例
+        """
+        # 解析微信返回的数据
+        userName = user_data.get("userName")
+        userId = user_data.get("userId")
+        userKey = user_data.get("userKey")
+        openId = user_data.get("openId")
+        phoneNumber = user_data.get("phoneNumber")
+
+        # 尝试根据 openId 查找现有用户
+        user, created = cls.objects.update_or_create(
+            openId=openId,
+            defaults={
+                "userName": userName,
+                "userId": userId,
+                "userKey": userKey,
+                "phoneNumber": phoneNumber,
+            },
+        )
+
+        return user
 
 
 class FavoriteFishingPond(models.Model):

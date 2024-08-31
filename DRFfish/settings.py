@@ -29,18 +29,22 @@ ALLOWED_HOSTS = []
 GDAL_LIBRARY_PATH = r"C:\\OSGeo4W\\bin\\gdal308.dll"
 GEOS_LIBRARY_PATH = r"C:\\OSGeo4W\\bin\\geos_c.dll"
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
-    ]
+        "rest_framework.permissions.AllowAny",
+    ],
 }
 # Application definition
-
+WECHAT_APPID = "wx63957ce7fc8134f1"
+WECHAT_SECRET = "a2fe09a8469cc4d2d725b64cf8c299b9"
+WECHAT_REDIRECT_URI = "http://127.0.0.1:1800/user_management/wechat/callback"
 INSTALLED_APPS = [
     "django.contrib.gis",
-    "fish",
-    "user_management",
+    "fish.apps.FishConfig",
+    "user_management.apps.UserManagementConfig",
     "rest_framework",
     "django.contrib.admin",
     "django.contrib.auth",
