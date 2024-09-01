@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "fish.apps.FishConfig",
     "user_management.apps.UserManagementConfig",
     "rest_framework",
+    "rest_framework.authtoken",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -57,6 +58,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "user_management.CustomUser"
 
 MIDDLEWARE = [
+    "middleware.TokenMiddleware.TokenExpirationMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

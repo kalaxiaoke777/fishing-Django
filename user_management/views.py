@@ -4,12 +4,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
 import requests
+from datetime import timedelta
 from urllib.parse import quote
 from django.contrib.auth import login, logout as django_logout
 from django.utils import timezone
 from .models import CustomUser
 from rest_framework.permissions import AllowAny
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.authtoken.models import Token
 
 
 class UserLoginView(APIView):
@@ -36,40 +38,73 @@ class WeChatLoginCallbackView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        code = request.GET.get("code")
-        if not code:
+        try:
+            code = request.GET.get("code")
+            if not code:
+                return Response(
+                    {"error": "Missing code parameter"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            appid = settings.WECHAT_APPID
+            secret = settings.WECHAT_SECRET
+            # url = f"https://api.weixin.qq.com/sns/oauth2/access_token?appid={appid}&secret={secret}&code={code}&grant_type=authorization_code"
+            url = f"https://api.weixin.qq.com/sns/jscode2session?appid={appid}&secret={secret}&js_code={code}&grant_type=authorization_code"
+            response = requests.get(url)
+            data = response.json()
+
+            access_token = data.get("session_key")
+            openid = data.get("openid")
+
+            if not access_token or not openid:
+                return Response(
+                    {"error": "Failed to get access token or openid"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            # 判断openid是否存在
+            if CustomUser.objects.filter(openId=openid).exists():
+                user = CustomUser.objects.get(openId=openid)
+                token, created = Token.objects.get_or_create(user=user)
+                return Response(
+                    {
+                        "openid": openid,
+                        "session_key": access_token,
+                        "token": token.key,
+                        "code": 200,
+                    }
+                )
+            else:
+                return Response(
+                    {"openid": openid, "session_key": access_token, "code": 50001}
+                )
+        except Exception as e:
             return Response(
-                {"error": "Missing code parameter"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-        appid = settings.WECHAT_APPID
-        secret = settings.WECHAT_SECRET
-        # url = f"https://api.weixin.qq.com/sns/oauth2/access_token?appid={appid}&secret={secret}&code={code}&grant_type=authorization_code"
-        url = f"https://api.weixin.qq.com/sns/jscode2session?appid={appid}&secret={secret}&js_code={code}&grant_type=authorization_code"
-        response = requests.get(url)
-        data = response.json()
-
-        access_token = data.get("session_key")
-        openid = data.get("openid")
-
-        if not access_token or not openid:
-            return Response(
-                {"error": "Failed to get access token or openid"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        return Response({"openid": openid, "session_key": access_token})
 
 
 class WeChatLoginRegister(APIView):
-    def post(self, request):
-        data = json.loads(request.body)
-        # 创建或更新用户
-        user = CustomUser.create_or_update_from_wechat(data)
-        user.last_login = timezone.now()
-        user.save(update_fields=["last_login"])
 
-        # 选择认证后端
-        backend = "django.contrib.auth.backends.ModelBackend"
-        user.backend = backend
-        login(request, user, backend=backend)
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+
+            # 假设 create_or_update_from_wechat 方法会根据微信的数据创建或更新用户
+            user = CustomUser.create_or_update_from_wechat(data)
+            user.last_login = timezone.now()
+            user.save(update_fields=["last_login"])
+
+            # 登录用户
+            backend = "django.contrib.auth.backends.ModelBackend"
+            user.backend = backend
+            login(request, user, backend=backend)
+
+            # 创建 Token
+            token, created = Token.objects.get_or_create(user=user)
+
+            # 设置 Token 有效期（例如 24 小时）
+            expires_at = timezone.now() + timedelta(hours=24)
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

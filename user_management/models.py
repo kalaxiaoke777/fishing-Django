@@ -2,13 +2,16 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 from fish.models import FishingPond
+import uuid
+from datetime import datetime
+import pytz
 
 
 class CustomUser(AbstractUser):
-    # 你可以添加额外的字段
-    id = models.BigIntegerField(primary_key=True, verbose_name="ID")
     userName = models.CharField(max_length=100, unique=True)
-    userId = models.CharField(max_length=100, unique=True)
+    userId = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True, verbose_name="唯一标识符"
+    )
     userKey = models.CharField(max_length=255, unique=True)
     openId = models.CharField(max_length=100, unique=True)
     phoneNumber = models.CharField(max_length=100, blank=True, unique=True)
@@ -30,8 +33,7 @@ class CustomUser(AbstractUser):
         :return: 创建或更新后的用户实例
         """
         # 解析微信返回的数据
-        userName = user_data.get("userName")
-        userId = user_data.get("userId")
+        userName = user_data.get("username")
         userKey = user_data.get("userKey")
         openId = user_data.get("openId")
         phoneNumber = user_data.get("phoneNumber")
@@ -41,9 +43,19 @@ class CustomUser(AbstractUser):
             openId=openId,
             defaults={
                 "userName": userName,
-                "userId": userId,
+                "userId": uuid.uuid4(),
+                "openId": openId,
                 "userKey": userKey,
                 "phoneNumber": phoneNumber,
+                "is_superuser": False,
+                "username": userName,
+                "first_name": "Anonymous",
+                "last_name": "Anonymous",
+                "email": "@email",
+                "date_joined": datetime.now(pytz.timezone("Asia/Shanghai")),
+                "is_active": True,
+                "is_staff": True,
+                "password": userKey,
             },
         )
 
