@@ -58,7 +58,12 @@ class FishingPond(models.Model):
     fish_species = ArrayField(
         models.CharField(max_length=100), blank=True, null=True, verbose_name="鱼种类"
     )
-
+    # 是否公开
+    is_public = models.BooleanField(default=True, verbose_name="是否公开")
+    # 用户id
+    user_id = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="用户"
+    )
     # 鱼塘位置（PostGIS的点字段，必填）
     location = models.PointField(srid=4326, verbose_name="鱼塘位置")
 

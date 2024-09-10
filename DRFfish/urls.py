@@ -9,4 +9,5 @@ urlpatterns = [
     path(
         "user_management/", include("user_management.urls", namespace="user_management")
     ),
+    path("fish/", include("fish.urls", namespace="fish")),
 ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])

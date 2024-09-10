@@ -24,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-*rq2s)7_8fg(d%*^u2adl=_k&=u1h#60wtokoy_x&apo9rpupm"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
-GDAL_LIBRARY_PATH = r"C:\\OSGeo4W\\bin\\gdal309.dll"
+ALLOWED_HOSTS = ["*"]
+GDAL_LIBRARY_PATH = r"C:\\OSGeo4W\\bin\\gdal308.dll"
 GEOS_LIBRARY_PATH = r"C:\\OSGeo4W\\bin\\geos_c.dll"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
