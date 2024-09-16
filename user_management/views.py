@@ -8,10 +8,53 @@ from datetime import timedelta
 from urllib.parse import quote
 from django.contrib.auth import login, logout as django_logout
 from django.utils import timezone
-from .models import CustomUser
+from .models import CustomUser, FavoriteFishingPond
+from fish.models import FishingPond
+from .serializers import FavoriteFishingPondSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.authtoken.models import Token
+
+
+class FavoriteFishing(APIView):
+
+    def get(self, request, format=None):
+        return Response(status=405)
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.GET.get("user")
+        fishing_pond_id = request.GET.get("fishing_pond")
+
+        try:
+            user = CustomUser.objects.get(openId=user_id)
+            fishing_pond = FishingPond.objects.get(pond_id=fishing_pond_id)
+        except CustomUser.DoesNotExist:
+            return Response(
+                {"success": False, "data": [], "msg": "none"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except FishingPond.DoesNotExist:
+            return Response(
+                {"success": False, "data": [], "msg": "none"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # 检查用户是否已经收藏过该鱼塘
+        if FavoriteFishingPond.objects.filter(
+            user=user, fishing_pond=fishing_pond
+        ).exists():
+            return Response(
+                {"success": False, "data": [], "msg": "用户一已收藏"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # 创建新的收藏记录
+        favorite = FavoriteFishingPond.objects.create(
+            user=user, fishing_pond=fishing_pond
+        )
+
+        serializer = FavoriteFishingPondSerializer(favorite)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class UserLoginView(APIView):

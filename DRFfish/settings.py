@@ -43,6 +43,7 @@ WECHAT_APPID = "wx63957ce7fc8134f1"
 WECHAT_SECRET = "a2fe09a8469cc4d2d725b64cf8c299b9"
 WECHAT_REDIRECT_URI = "http://127.0.0.1:1800/user_management/wechat/callback"
 INSTALLED_APPS = [
+    "corsheaders",
     "django.contrib.gis",
     "fish.apps.FishConfig",
     "user_management.apps.UserManagementConfig",
@@ -59,11 +60,12 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "user_management.CustomUser"
 
 MIDDLEWARE = [
-    "middleware.TokenMiddleware.TokenExpirationMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    # "middleware.TokenMiddleware.TokenExpirationMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",

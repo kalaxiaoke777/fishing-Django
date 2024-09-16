@@ -63,11 +63,11 @@ class CustomUser(AbstractUser):
 
 
 class FavoriteFishingPond(models.Model):
-    # 用户（外键引用 User 模型）
+    # 用户（外键引用 CustomUser 模型）
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        CustomUser,
         on_delete=models.CASCADE,
-        related_name="favorite_fishing_ponds",
+        related_name="favorite_ponds",
         verbose_name="用户",
     )
 

@@ -7,3 +7,4 @@ django-filter  # Filtering support
 proj
 GEOS
 psycopg2
+django-cors-headers
