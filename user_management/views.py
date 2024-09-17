@@ -24,6 +24,7 @@ class FavoriteFishing(APIView):
     def post(self, request, *args, **kwargs):
         user_id = request.GET.get("user")
         fishing_pond_id = request.GET.get("fishing_pond")
+        favortite = request.GET.get("favortite")
 
         try:
             user = CustomUser.objects.get(openId=user_id)
