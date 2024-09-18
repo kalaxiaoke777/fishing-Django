@@ -42,13 +42,25 @@ class FishingPondSerializer(serializers.ModelSerializer):
 class FishingPondSearchSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     distance = serializers.SerializerMethodField()
+    latitude = serializers.SerializerMethodField()
+    longitude = serializers.SerializerMethodField()
 
     class Meta:
         model = FishingPond
-        fields = ["name", "id", "distance"]
+        fields = ["name", "id", "distance", "latitude", "longitude", "is_public"]
 
     def get_id(self, obj):
         return obj.pond_id
 
     def get_distance(self, obj):
         return 12
+
+    def get_latitude(self, obj):
+        if obj.location:
+            return obj.location.y
+        return None
+
+    def get_longitude(self, obj):
+        if obj.location:
+            return obj.location.x
+        return None
