@@ -69,6 +69,7 @@ class SearchFish(APIView):
             # 获取请求参数
             name = request.GET.get("name", "").strip()
             user_id = request.GET.get("id")
+            onloadLocation = json.loads(request.GET.get("onloadLocation"))
 
             # 如果name为空，直接返回空结果
             if not name:
@@ -94,7 +95,9 @@ class SearchFish(APIView):
             fish_pond = FishingPond.objects.filter(query)
 
             # 序列化结果
-            serializer = FishingPondSearchSerializer(fish_pond, many=True)
+            serializer = FishingPondSearchSerializer(
+                fish_pond, many=True, context={"request": request}
+            )
 
             return Response(
                 {
