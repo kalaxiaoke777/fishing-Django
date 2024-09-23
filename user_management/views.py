@@ -109,6 +109,10 @@ class WeChatLoginCallbackView(APIView):
             if CustomUser.objects.filter(openId=openid).exists():
                 user = CustomUser.objects.get(openId=openid)
                 token, created = Token.objects.get_or_create(user=user)
+                # 登录用户
+                backend = "django.contrib.auth.backends.ModelBackend"
+                user.backend = backend
+                login(request, user, backend=backend)
                 return Response(
                     {
                         "openid": openid,
@@ -138,17 +142,15 @@ class WeChatLoginRegister(APIView):
             user.last_login = timezone.now()
             user.save(update_fields=["last_login"])
 
-            # 登录用户
-            backend = "django.contrib.auth.backends.ModelBackend"
-            user.backend = backend
-            login(request, user, backend=backend)
-
-            # 创建 Token
-            token, created = Token.objects.get_or_create(user=user)
-
-            # 设置 Token 有效期（例如 24 小时）
-            expires_at = timezone.now() + timedelta(hours=24)
+            return Response(
+                {
+                    "message": "注册成功",
+                    "data": [],
+                    "code": 200,
+                }
+            )
         except Exception as e:
             return Response(
-                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"message": str(e), "success": False},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )

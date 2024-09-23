@@ -34,7 +34,7 @@ class CustomUser(AbstractUser):
         """
         # 解析微信返回的数据
         userName = user_data.get("username")
-        userKey = user_data.get("userKey")
+        userKey = user_data.get("openId")
         openId = user_data.get("openId")
         phoneNumber = user_data.get("phoneNumber")
 
