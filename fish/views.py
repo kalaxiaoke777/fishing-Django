@@ -13,6 +13,7 @@ from user_management.models import FavoriteFishingPond, CustomUser
 from rest_framework.permissions import AllowAny
 from .serializers import FishingPondSerializer, FishingPondSearchSerializer
 from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
 
 
 class GetFish(APIView):
@@ -107,6 +108,57 @@ class SearchFish(APIView):
                 },
                 status=status.HTTP_200_OK,
             )
+        except Exception as e:
+            return Response(
+                {"success": False, "data": [], "msg": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10  # 默认每页返回10个结果
+    page_size_query_param = "page_size"  # 允许用户自定义每页的大小
+    max_page_size = 100  # 允许的最大每页大小
+
+
+class GetFishList(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        try:
+            user_id = request.GET.get("openid")
+            is_public = request.GET.get("isPublic")
+            isFavorite = request.GET.get("isFavorite")
+            if is_public == "1":
+                fish_pond = FishingPond.objects.filter(is_public=True)
+            else:
+                fish_pond = FishingPond.objects.filter(is_public=False, user_id=user_id)
+
+            if isFavorite:
+                if not user_id:
+                    raise Exception("openid is None")
+                # 获取用户对象
+                _user_id_obj = CustomUser.objects.get(openId=user_id)
+                _user_id = _user_id_obj.id
+
+                # 获取用户喜欢的所有钓鱼池 ID
+                favorite_fish_pond_ids = FavoriteFishingPond.objects.filter(
+                    user_id=_user_id
+                ).values_list("fishing_pond_id", flat=True)
+
+                # 查找对应的钓鱼池记录
+                fish_pond = FishingPond.filter(pond_id__in=favorite_fish_pond_ids)
+
+            # 初始化分页
+            paginator = StandardResultsSetPagination()
+            paginated_fish_pond = paginator.paginate_queryset(fish_pond, request)
+
+            # 序列化数据
+            serializer = FishingPondSerializer(
+                paginated_fish_pond, many=True, context={"request": request}
+            )
+            return paginator.get_paginated_response(serializer.data)
+
         except Exception as e:
             return Response(
                 {"success": False, "data": [], "msg": str(e)},
