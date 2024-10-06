@@ -11,9 +11,14 @@ from django.utils import timezone
 from .models import FishingPond
 from user_management.models import FavoriteFishingPond, CustomUser
 from rest_framework.permissions import AllowAny
-from .serializers import FishingPondSerializer, FishingPondSearchSerializer
+from .serializers import (
+    FishingPondSerializer,
+    FishingPondSingleSerializer,
+    FishingPondSearchSerializer,
+)
 from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination
+from django.contrib.gis.geos import Point
 
 
 class GetFish(APIView):
@@ -46,6 +51,38 @@ class GetFish(APIView):
                 )
             serializer = FishingPondSerializer(
                 fish_pond, many=True, context={"request": request}
+            )
+            return Response(
+                {
+                    "success": False,
+                    "code": 200,
+                    "data": serializer.data,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"success": False, "data": [], "msg": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class GetFishSingle(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        try:
+            user_id = request.GET.get("user_id")
+            is_public = bool(request.GET.get("is_public"))
+            id = request.GET.get("id")
+            if is_public:
+                fish_pond = FishingPond.objects.get(uuid=id)
+            else:
+                fish_pond = FishingPond.objects.get(
+                    is_public=False, user_id=user_id, uuid=id
+                )
+            serializer = FishingPondSingleSerializer(
+                fish_pond, context={"request": request}
             )
             return Response(
                 {
@@ -159,6 +196,53 @@ class GetFishList(APIView):
             )
             return paginator.get_paginated_response(serializer.data)
 
+        except Exception as e:
+            return Response(
+                {"success": False, "data": [], "msg": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class AddFish(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        try:
+            location_data = request.data.get("location", {})
+            location = None
+            if location_data and "coordinates" in location_data:
+                coordinates = location_data["coordinates"]
+                location = Point(coordinates[0], coordinates[1])
+            else:
+                raise Exception("Invalid location data")
+            if request.data.get("is_public", "") is False:
+                if request.data.get("user_id") == "":
+                    raise Exception("user_id is required when is_public is True")
+            fish = FishingPond.objects.create(
+                uuid=request.data.get("uuid", ""),
+                name=request.data.get("title", ""),
+                description=request.data.get("description", ""),
+                rating=request.data.get("rating", ""),
+                price=request.data.get("price", ""),
+                pond_type=request.data.get("pond_type", ""),
+                image_base64=request.data.get("image_base64", ""),
+                phone_number=request.data.get("phone_number", ""),
+                opening_time=request.data.get("opening_time", ""),
+                closing_time=request.data.get("closing_time", ""),
+                fish_species=request.data.get("fish_species", ""),
+                is_public=request.data.get("is_public", ""),
+                user_id=request.data.get("user_id", ""),
+                location=location,
+            )
+            fish.save()
+            return Response(
+                {
+                    "success": True,
+                    "code": 200,
+                    "data": [],
+                },
+                status=status.HTTP_200_OK,
+            )
         except Exception as e:
             return Response(
                 {"success": False, "data": [], "msg": str(e)},

@@ -42,6 +42,12 @@ class FishingPondSerializer(serializers.ModelSerializer):
         return False
 
 
+class FishingPondSingleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FishingPond
+        fields = "__all__"
+
+
 class FishingPondSearchSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     distance = serializers.SerializerMethodField()
