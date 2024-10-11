@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-*rq2s)7_8fg(d%*^u2adl=_k&=u1h#60wtokoy_x&apo9rpupm"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 GDAL_LIBRARY_PATH = r"C:\\OSGeo4W\\bin\\gdal309.dll"
