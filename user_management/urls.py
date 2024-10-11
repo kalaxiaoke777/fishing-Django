@@ -5,6 +5,7 @@ from .views import (
     WeChatLoginCallbackView,
     WeChatLoginRegister,
     FavoriteFishing,
+    UpdateUser,
 )
 
 app_name = "user_management"
@@ -25,5 +26,10 @@ urlpatterns = [
         "favoriteFishing/",
         FavoriteFishing.as_view(),
         name="favoriteFishing",
+    ),
+    path(
+        "updateUser/",
+        UpdateUser.as_view(),
+        name="updateUser",
     ),
 ]

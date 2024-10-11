@@ -154,3 +154,42 @@ class WeChatLoginRegister(APIView):
                 {"message": str(e), "success": False},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+class UpdateUser(APIView):
+    """
+    @summary: 更新用户信息
+    need: openid
+    user_name: 用户名
+    phone_number: 手机号
+    """
+
+    def post(self, request):
+        try:
+            openid = request.GET.get("openid")
+            user_name = request.GET.get("user_name")
+            phone_number = request.GET.get("phone_number")
+
+            if CustomUser.objects.filter(openId=openid).exists():
+                user = CustomUser.objects.get(openId=openid)
+                user.user_name = user_name
+                user.phone_number = phone_number
+                user.save()
+                return Response(
+                    {
+                        "message": "修改成功",
+                        "data": {
+                            "user_name": user_name,
+                            "phone_number": phone_number,
+                        },
+                        "code": 200,
+                    }
+                )
+            else:
+                raise Exception("用户不存在")
+
+        except Exception as e:
+            return Response(
+                {"message": str(e), "success": False},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
