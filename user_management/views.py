@@ -117,13 +117,21 @@ class WeChatLoginCallbackView(APIView):
                     {
                         "openid": openid,
                         "session_key": access_token,
+                        "userName": user.username,
+                        "phoneNumber": user.phoneNumber,
                         "token": token.key,
                         "code": 200,
                     }
                 )
             else:
                 return Response(
-                    {"openid": openid, "session_key": access_token, "code": 50001}
+                    {
+                        "openid": openid,
+                        "session_key": access_token,
+                        "code": 50001,
+                        "userName": "",
+                        "phoneNumber": "",
+                    }
                 )
         except Exception as e:
             return Response(
