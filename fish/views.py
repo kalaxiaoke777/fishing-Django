@@ -15,6 +15,7 @@ from .serializers import (
     FishingPondSerializer,
     FishingPondSingleSerializer,
     FishingPondSearchSerializer,
+    FishingPondsSerializer,
 )
 from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination
@@ -191,7 +192,7 @@ class GetFishList(APIView):
             paginated_fish_pond = paginator.paginate_queryset(fish_pond, request)
 
             # 序列化数据
-            serializer = FishingPondSerializer(
+            serializer = FishingPondsSerializer(
                 paginated_fish_pond, many=True, context={"request": request}
             )
             return paginator.get_paginated_response(serializer.data)
